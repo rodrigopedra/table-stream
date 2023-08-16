@@ -35,7 +35,7 @@ final class Table
 
         $row = \array_values($row);
         $row = \array_map(
-            static fn (Column $column, int $index) => $column->formatValue($row[$index]),
+            static fn (Column $column, int $index) => $column->formatValue($row[$index] ?? null),
             $this->columns,
             \array_keys($this->columns),
         );

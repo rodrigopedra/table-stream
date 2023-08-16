@@ -65,12 +65,12 @@ final class Column
 
     public function divider(): string
     {
-        return $this->formatValue('', '-');
+        return $this->formatValue(null, '-');
     }
 
-    public function formatValue($value, string $padWith = ' '): string
+    public function formatValue(?string $value, string $padWith = ' '): string
     {
-        $formatted = \str_pad(\strval($value), $this->width, $padWith, $this->padTo);
+        $formatted = \str_pad($value ?? '', $this->width, $padWith, $this->padTo);
         $this->width = \max($this->width, \strlen($formatted));
 
         return $padWith . $formatted . $padWith;
