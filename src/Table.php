@@ -7,7 +7,7 @@ final class Table
     private OutputInterface $output;
     private array $columns;
     private int $headerOffset;
-    private int $sentinel = 0;
+    private int $count = 0;
 
     public function __construct(array $columns, ?OutputInterface $output = null)
     {
@@ -22,14 +22,13 @@ final class Table
         \assert($headerOffset > -1, '$headerOffset should be a non-negative integer');
 
         $this->headerOffset = $headerOffset;
-        $this->sentinel = $headerOffset;
 
         return $this;
     }
 
     public function appendRow(array $row): void
     {
-        if ($this->sentinel === $this->headerOffset) {
+        if ($this->count % $this->headerOffset === 0) {
             $this->writeHeaders();
         }
 
@@ -41,14 +40,16 @@ final class Table
         );
 
         $this->writeRow($row, '|');
-        $this->sentinel++;
+        $this->count++;
     }
 
     public function close(): void
     {
-        $this->writeDivider();
+        if ($this->count > 0) {
+            $this->writeDivider();
+        }
 
-        $this->sentinel = 0;
+        $this->count = 0;
     }
 
     private function writeDivider(): void
@@ -65,12 +66,15 @@ final class Table
         $this->writeDivider();
         $this->writeRow($fields, '|');
         $this->writeDivider();
-
-        $this->sentinel = 0;
     }
 
     private function writeRow(array $row, string $separator): void
     {
         $this->output->writeLine($separator . \implode($separator, $row) . $separator);
+    }
+
+    public function __destruct()
+    {
+        $this->close();
     }
 }
